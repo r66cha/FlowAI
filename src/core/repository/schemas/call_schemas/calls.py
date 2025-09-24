@@ -3,6 +3,7 @@
 # -- Imports
 
 import enum
+from datetime import datetime
 from pydantic import BaseModel
 from uuid import UUID
 
@@ -34,8 +35,9 @@ class CallStatus(str, enum.Enum):
 
 
 class CallCreate(BaseModel):
-    caller: str
-    receiver: str
+    caller: str = "+79001234567"
+    receiver: str = "+74951234567"
+    started_at: datetime = datetime.fromisoformat("2025-09-20T10:00:00")
 
 
 class CallOut(BaseModel):

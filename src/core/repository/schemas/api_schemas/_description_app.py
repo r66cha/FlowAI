@@ -12,6 +12,6 @@ __all__ = ["DescriptionAppSchema"]
 
 
 class DescriptionAppSchema(BaseModel):
-    title: str = "FlowAI"
+    title: str = "FlowAI-test"
     description: str = "AI calls handler."
     version: str = "1.0.0"

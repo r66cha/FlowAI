@@ -31,6 +31,7 @@ class CallCRUD:
         caller: str,
         receiver: str,
     ) -> UUID:
+        """Создаёт запись данных о звонке."""
 
         call = Call(caller=caller, receiver=receiver)
         session.add(call)
@@ -38,6 +39,18 @@ class CallCRUD:
         await session.refresh(call)
 
         return call.id
+
+    async def create_recording(
+        self,
+        session: AsyncSession,
+        call_id: UUID,
+        filename: str,
+    ) -> None:
+        """Создаёт запись о прикреплённой аудиозаписи звонка."""
+
+        recording = Recording(call_id=call_id, filename=filename)
+        session.add(recording)
+        await session.commit()
 
 
 async def get_call_crud():

@@ -35,10 +35,16 @@ class Call(Base):
         primary_key=True,
         default=uuid.uuid4,
     )
-    caller: Mapped[str] = mapped_column(String, nullable=False)
-    receiver: Mapped[str] = mapped_column(String, nullable=False)
+    caller: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
+    receiver: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
     started_at: Mapped[datetime.datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         default=datetime.datetime.now(datetime.timezone.utc),
     )
     status: Mapped[CallStatus] = mapped_column(
@@ -58,14 +64,27 @@ class Recording(Base):
 
     __tablename__ = "recordings"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
     call_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("calls.id", ondelete="CASCADE"),
         nullable=False,
     )
-    filename: Mapped[str] = mapped_column(String, nullable=False)
-    duration: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    transcription: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    filename: Mapped[str] = mapped_column(
+        String,
+        nullable=False,
+    )
+    duration: Mapped[Optional[int]] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+    transcription: Mapped[Optional[str]] = mapped_column(
+        String,
+        nullable=True,
+    )
 
     call: Mapped["Call"] = relationship(back_populates="recording")
