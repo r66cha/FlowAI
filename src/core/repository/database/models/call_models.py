@@ -33,7 +33,8 @@ class Call(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         primary_key=True,
-        default=uuid.uuid4,
+        default=uuid.uuid4,  # генерируется в Python
+        nullable=False,
     )
     caller: Mapped[str] = mapped_column(
         String,
