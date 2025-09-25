@@ -9,3 +9,7 @@
 ```bash
 docker compose up --build -d
 ```
+
+## Ссылка на документацию
+
+http://localhost:8000/docs#/
