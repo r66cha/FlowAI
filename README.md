@@ -8,5 +8,4 @@
 
 ```bash
 docker compose up --build -d
-alembic upgrade head
 ```

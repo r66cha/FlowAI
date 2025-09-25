@@ -12,4 +12,4 @@ RUN uv sync --frozen --no-dev
 
 COPY . .
 
-CMD ["uv", "run", "main.py"]
+CMD alembic upgrade head && uv run main.py
