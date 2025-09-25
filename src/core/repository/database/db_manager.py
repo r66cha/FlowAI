@@ -1,4 +1,4 @@
-"""Менеджер БД."""
+"""DB Manager."""
 
 # -- Imports
 
@@ -33,7 +33,7 @@ class DatabaseManager:
 
     async def dispose(self) -> None:
         await self.engine.dispose()
-        log.info("Ядро базы данных удалено")
+        log.info("The database core has been deleted")
 
     async def get_session(self) -> AsyncGenerator[AsyncSession, None]:
         async with self.session_factory() as session:
