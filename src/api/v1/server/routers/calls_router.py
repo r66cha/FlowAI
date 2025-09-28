@@ -84,3 +84,22 @@ async def upload_recording(
     )
 
     return {f"File: {filename} saved"}
+
+
+@calls_r.get(
+    path="/{call_id}",
+    status_code=status.HTTP_200_OK,
+    name="call-info-get",
+)
+async def get_call(
+    session: Annotated[AsyncSession, Depends(db_manager.get_session)],
+    call_crud: Annotated[CallCRUD, Depends(get_call_crud)],
+    call_id: UUID,
+):
+    """Возвращает данные звонка по его call_id."""
+
+    result = await call_crud.get_call_info(
+        session=session,
+        call_id=call_id,
+    )
+    return result

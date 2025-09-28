@@ -3,6 +3,8 @@
 # --- Imports
 
 import logging
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.core.repository.database.models import Call, Recording  # noqa: F401
 from uuid import UUID
@@ -47,7 +49,7 @@ class CallCRUD:
         filename: str,
         duration: int,
         transcription: str,
-    ) -> None:
+    ) -> dict | None:
         """Создаёт запись о прикреплённой аудиозаписи звонка."""
 
         recording = Recording(
@@ -63,7 +65,15 @@ class CallCRUD:
         self,
         session: AsyncSession,
         call_id: UUID,
-    ): ...
+    ):
+        """Возвращает информацию о звонке."""
+
+        stmt = (
+            select(Call).where(Call.id == call_id).options(selectinload(Call.recording))
+        )
+        result = await session.execute(stmt)
+
+        return result.scalar_one_or_none()
 
 
 async def get_call_crud():

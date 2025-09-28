@@ -6,10 +6,12 @@
 2. Переименуйте .env.example в .env
 3. Выполните команду:
 
-```bash
+```shell
 docker compose up --build -d
 ```
 
 ## Ссылка на документацию
 
-http://localhost:8000/docs#/
+Swagger: http://localhost:8000/docs
+RabbitMQ: http://localhost:15672
+Flower: http://0.0.0.0:5555

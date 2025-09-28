@@ -14,6 +14,7 @@ from src.core.repository.database.crud import CallCRUD
 from src.core.repository.database.db_manager import db_manager
 
 from uuid import UUID
+from time import sleep
 
 
 if TYPE_CHECKING:
@@ -35,6 +36,8 @@ def process_recordings(
     call_id: str,
     filename: str,
 ):
+
+    sleep(5)  # Имитация выполнения долгой таски
 
     audio = AudioSegment.from_file(file_path)
     duration_sec = len(audio) / 1000
