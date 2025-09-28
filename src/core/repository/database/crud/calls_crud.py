@@ -42,7 +42,7 @@ class CallCRUD:
 
         return call.id
 
-    async def create_recording(
+    def create_recording(
         self,
         session: AsyncSession,
         call_id: UUID,
@@ -59,7 +59,7 @@ class CallCRUD:
             transcription=transcription,
         )
         session.add(recording)
-        await session.commit()
+        session.commit()
 
     async def get_call_info(
         self,

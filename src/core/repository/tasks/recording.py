@@ -2,7 +2,6 @@
 
 # -- Imports
 
-import asyncio
 import logging
 
 
@@ -11,10 +10,11 @@ from src.core.repository.services.celery import celery_app
 from typing import TYPE_CHECKING
 
 from src.core.repository.database.crud import CallCRUD
-from src.core.repository.database.db_manager import db_manager
 
 from uuid import UUID
 from time import sleep
+
+from src.core.repository.database import DatabaseManager, db_url
 
 
 if TYPE_CHECKING:
@@ -39,6 +39,8 @@ def process_recordings(
 
     sleep(5)  # Имитация выполнения долгой таски
 
+    db_manager = DatabaseManager(db_url=db_url.get_DB_URL_API)
+
     audio = AudioSegment.from_file(file_path)
     duration_sec = len(audio) / 1000
 
@@ -46,10 +48,10 @@ def process_recordings(
 
     log.info("Detected speech fragment:: %s", first_20_sec)  # Псевдотранскрипция
 
-    async def _save():
-        async for session in db_manager.get_session():
+    def _save():
+        for session in db_manager.get_session():
             crud = CallCRUD()
-            await crud.create_recording(
+            crud.create_recording(
                 session=session,
                 call_id=UUID(call_id),
                 filename=filename,
@@ -57,4 +59,7 @@ def process_recordings(
                 transcription=str(first_20_sec),
             )
 
-    asyncio.run(_save())
+    try:
+        _save()
+    except Exception as e:
+        log.error("Exception: %s", e)

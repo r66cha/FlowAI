@@ -14,7 +14,7 @@ from .db_config import db_url
 
 # -- Exports
 
-__all__ = ["db_manager"]
+__all__ = ["db_manager", "DatabaseManager"]
 
 # --
 
