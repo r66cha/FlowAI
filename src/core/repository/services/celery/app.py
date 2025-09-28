@@ -13,6 +13,7 @@ __all__ = ["celery_app"]
 
 TASKS_DIR = "src.core.repository.tasks"
 
+# Можно также использовать Redis в качестве брокера
 celery_app = Celery(
     "my_app",
     broker="amqp://guest:guest@rabbitmq:5672//",
