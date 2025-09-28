@@ -10,7 +10,7 @@
 docker compose up --build -d
 ```
 
-## Ссылка на документацию
+## Ссылки
 
 - Swagger: [http://localhost:8000/docs](http://localhost:8000/docs)
 - RabbitMQ: [http://localhost:15672](http://localhost:15672)
