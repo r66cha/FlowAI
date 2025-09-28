@@ -45,12 +45,25 @@ class CallCRUD:
         session: AsyncSession,
         call_id: UUID,
         filename: str,
+        duration: int,
+        transcription: str,
     ) -> None:
         """Создаёт запись о прикреплённой аудиозаписи звонка."""
 
-        recording = Recording(call_id=call_id, filename=filename)
+        recording = Recording(
+            call_id=call_id,
+            filename=filename,
+            duration=duration,
+            transcription=transcription,
+        )
         session.add(recording)
         await session.commit()
+
+    async def get_call_info(
+        self,
+        session: AsyncSession,
+        call_id: UUID,
+    ): ...
 
 
 async def get_call_crud():

@@ -1,0 +1,22 @@
+"""Celery app module."""
+
+# -- Imports
+
+from celery import Celery
+
+
+# -- Exports
+
+__all__ = ["celery_app"]
+
+# --
+
+TASKS_DIR = "src.core.repository.tasks"
+
+celery_app = Celery(
+    "my_app",
+    broker="amqp://guest:guest@rabbitmq:5672//",
+    include=[f"{TASKS_DIR}.recording"],
+    backend="rpc://",
+    broker_connection_retry_on_startup=True,
+)

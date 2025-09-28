@@ -3,7 +3,8 @@
 # -- Import
 
 import logging
-import shutil
+import aiofiles
+
 from pathlib import Path
 from uuid import UUID
 from typing import Annotated
@@ -15,6 +16,7 @@ from src.core.repository.database.crud import CallCRUD, get_call_crud
 from src.core.repository.database.db_manager import db_manager
 from src.core.config import settings
 from src.core.repository.schemas import CallCreate
+from src.core.repository.tasks import process_recordings
 
 
 log = logging.getLogger(__name__)
@@ -43,12 +45,12 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 )
 async def create_call(
     session: Annotated[AsyncSession, Depends(db_manager.get_session)],
-    task_crud: Annotated[CallCRUD, Depends(get_call_crud)],
+    call_crud: Annotated[CallCRUD, Depends(get_call_crud)],
     call_in: CallCreate,
 ):
     """Записывает данные вызова и возвращает его UUID."""
 
-    call_id = await task_crud.create_call(
+    call_id = await call_crud.create_call(
         session=session,
         caller=call_in.caller,
         receiver=call_in.receiver,
@@ -64,8 +66,6 @@ async def create_call(
 )
 async def upload_recording(
     call_id: UUID,
-    session: Annotated[AsyncSession, Depends(db_manager.get_session)],
-    task_crud: Annotated[CallCRUD, Depends(get_call_crud)],
     file: UploadFile = File(...),
 ):
     """Загружает аудиозапись звонка, сохраняет на диск и создаёт запись в БД."""
@@ -73,13 +73,14 @@ async def upload_recording(
     filename = file.filename
     file_path = UPLOAD_DIR / filename
 
-    # сохраняем файл на диск
-    with file_path.open("wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    async with aiofiles.open(file_path, "wb") as out_file:
+        while content := await file.read(1024):
+            await out_file.write(content)
 
-    # создаём запись в БД
-    await task_crud.create_recording(
-        session=session,
-        call_id=call_id,
+    process_recordings.delay(
+        file_path=str(file_path),
+        call_id=str(call_id),
         filename=filename,
     )
+
+    return {f"File: {filename} saved"}
