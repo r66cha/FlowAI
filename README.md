@@ -12,6 +12,6 @@ docker compose up --build -d
 
 ## Ссылка на документацию
 
-Swagger: http://localhost:8000/docs
-RabbitMQ: http://localhost:15672
-Flower: http://0.0.0.0:5555
+- Swagger: [http://localhost:8000/docs](http://localhost:8000/docs)
+- RabbitMQ: [http://localhost:15672](http://localhost:15672)
+- Flower: [http://0.0.0.0:5555](http://0.0.0.0:5555)
