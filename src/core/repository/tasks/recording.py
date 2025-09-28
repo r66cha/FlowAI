@@ -4,7 +4,6 @@
 
 import logging
 
-
 from pydub import AudioSegment
 from src.core.repository.services.celery import celery_app
 from typing import TYPE_CHECKING
@@ -40,6 +39,7 @@ def process_recordings(
     sleep(5)  # Имитация выполнения долгой таски
 
     db_manager = DatabaseManager(db_url=db_url.get_DB_URL_API)
+    crud = CallCRUD()
 
     audio = AudioSegment.from_file(file_path)
     duration_sec = len(audio) / 1000
@@ -49,8 +49,7 @@ def process_recordings(
     log.info("Detected speech fragment:: %s", first_20_sec)  # Псевдотранскрипция
 
     def _save():
-        for session in db_manager.get_session():
-            crud = CallCRUD()
+        for session in db_manager.get_sync_session():
             crud.create_recording(
                 session=session,
                 call_id=UUID(call_id),
@@ -59,7 +58,4 @@ def process_recordings(
                 transcription=str(first_20_sec),
             )
 
-    try:
-        _save()
-    except Exception as e:
-        log.error("Exception: %s", e)
+    _save()

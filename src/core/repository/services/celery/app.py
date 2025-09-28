@@ -16,7 +16,7 @@ TASKS_DIR = "src.core.repository.tasks"
 celery_app = Celery(
     "my_app",
     broker="amqp://guest:guest@rabbitmq:5672//",
-    include=[f"{TASKS_DIR}.recording"],
-    backend="rpc://",
+    include=[TASKS_DIR],
+    backend=None,
     broker_connection_retry_on_startup=True,
 )
