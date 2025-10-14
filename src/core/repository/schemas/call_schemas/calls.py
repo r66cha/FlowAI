@@ -6,6 +6,7 @@ import enum
 from datetime import datetime
 from pydantic import BaseModel
 from uuid import UUID
+from typing import Optional, Any
 
 
 # -- Exports
@@ -14,6 +15,8 @@ __all__ = [
     "CallStatus",
     "CallCreate",
     "CallOut",
+    "UploadRecordingResponse",
+    "CallRead",
 ]
 
 # -- Constants
@@ -42,3 +45,31 @@ class CallCreate(BaseModel):
 
 class CallOut(BaseModel):
     id: UUID
+
+
+class UploadRecordingResponse(BaseModel):
+    status: str
+    task_id: Any
+
+
+class RecordingRead(BaseModel):
+    id: int
+    duration: int
+    call_id: UUID
+    filename: str
+    transcription: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class CallRead(BaseModel):
+    id: UUID
+    caller: str
+    receiver: str
+    status: str
+    started_at: datetime
+    recording: Optional[RecordingRead] = None
+
+    class Config:
+        from_attributes = True

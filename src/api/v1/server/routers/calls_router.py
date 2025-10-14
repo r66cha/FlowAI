@@ -9,13 +9,13 @@ from pathlib import Path
 from uuid import UUID
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status, UploadFile, File
+from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.repository.database.crud import CallCRUD, get_call_crud
 from src.core.repository.database.db_manager import db_manager
 from src.core.config import settings
-from src.core.repository.schemas import CallCreate
+from src.core.repository.schemas import CallCreate, UploadRecordingResponse, CallRead
 from src.core.repository.tasks import process_recordings
 
 
@@ -62,6 +62,7 @@ async def create_call(
 @calls_r.post(
     path="/{call_id}/recording/",
     status_code=status.HTTP_201_CREATED,
+    response_model=UploadRecordingResponse,
     name="upload-call-recording",
 )
 async def upload_recording(
@@ -77,18 +78,19 @@ async def upload_recording(
         while content := await file.read(1024):
             await out_file.write(content)
 
-    process_recordings.delay(
+    task = process_recordings.delay(
         file_path=str(file_path),
         call_id=str(call_id),
         filename=filename,
     )
 
-    return {f"File: {filename} saved"}
+    return {"status": f"{filename} saved", "task_id": task.id}
 
 
 @calls_r.get(
     path="/{call_id}",
     status_code=status.HTTP_200_OK,
+    response_model=CallRead,
     name="call-info-get",
 )
 async def get_call(
@@ -102,4 +104,10 @@ async def get_call(
         session=session,
         call_id=call_id,
     )
+
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Data not found."
+        )
+
     return result
