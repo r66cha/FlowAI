@@ -1,1 +1,3 @@
-from .calls_crud import *  # noqa: F403
+from .calls_crud import CallCRUD
+
+__all__ = ["CallCRUD"]

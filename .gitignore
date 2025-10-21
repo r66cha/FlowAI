@@ -6,3 +6,4 @@ venv/
 *.ex
 *.exs
 .pytest_cache/
+aaa.py

@@ -7,16 +7,13 @@ import aiofiles
 
 from pathlib import Path
 from uuid import UUID
-from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, HTTPException, status, UploadFile, File
 
-from src.core.repository.database.crud import CallCRUD, get_call_crud
-from src.core.repository.database.db_manager import db_manager
 from src.core.config import settings
 from src.core.repository.schemas import CallCreate, UploadRecordingResponse, CallRead
 from src.core.repository.tasks import process_recordings
+from src.core.repository.database.crud import CallCRUD
 
 
 log = logging.getLogger(__name__)
@@ -43,15 +40,10 @@ UPLOAD_DIR.mkdir(exist_ok=True)
     response_model=UUID,
     name="crete-call",
 )
-async def create_call(
-    session: Annotated[AsyncSession, Depends(db_manager.get_session)],
-    call_crud: Annotated[CallCRUD, Depends(get_call_crud)],
-    call_in: CallCreate,
-):
+async def create_call(call_in: CallCreate):
     """Записывает данные вызова и возвращает его UUID."""
 
-    call_id = await call_crud.create_call(
-        session=session,
+    call_id = await CallCRUD.create_call(
         caller=call_in.caller,
         receiver=call_in.receiver,
     )
@@ -71,8 +63,15 @@ async def upload_recording(
 ):
     """Загружает аудиозапись звонка, сохраняет на диск и создаёт запись в БД."""
 
+    is_UUID = await CallCRUD._check_UUID(call_id)
+    if not is_UUID:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="UUID: %r not exist" % call_id,
+        )
+
     filename = file.filename
-    file_path = UPLOAD_DIR / filename
+    file_path = UPLOAD_DIR / (filename or "")
 
     async with aiofiles.open(file_path, "wb") as out_file:
         while content := await file.read(1024):
@@ -93,15 +92,10 @@ async def upload_recording(
     response_model=CallRead,
     name="call-info-get",
 )
-async def get_call(
-    session: Annotated[AsyncSession, Depends(db_manager.get_session)],
-    call_crud: Annotated[CallCRUD, Depends(get_call_crud)],
-    call_id: UUID,
-):
+async def get_call(call_id: UUID):
     """Возвращает данные звонка по его call_id."""
 
-    result = await call_crud.get_call_info(
-        session=session,
+    result = await CallCRUD.get_call_info(
         call_id=call_id,
     )
 
