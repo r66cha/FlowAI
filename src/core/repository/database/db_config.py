@@ -40,4 +40,4 @@ class DB_URL(BaseSettings):
         return f"{self.dialect}://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
 
-db_url = DB_URL()
+db_url = DB_URL()  # type: ignore
