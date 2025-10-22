@@ -1,4 +1,4 @@
-# FlowAI-test
+# FlowAI
 
 ## Инструкция
 
